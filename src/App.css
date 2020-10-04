@@ -1,0 +1,171 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #f08a5d;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: #f9ed69;
+  text-shadow: 1px 2px purple;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.Heatmap-Container {
+  height: 400px;
+  width: 840px
+}
+
+
+.HeaderPar {
+  font-size: 2.3rem;
+  font-weight: bold;
+}
+
+
+.File-Label {
+  text-align: center;
+  border: 4px dashed #b83b5e;
+  background-color: #6a2c70;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bolder;
+  font-style: initial;
+  color: khaki;
+  font-family: "Lucida Grande", Geneva, Verdana, Arial, Helvetica, sans-serif;
+  border-radius: 5px;
+}
+
+.File-Label :active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
+.File-Label:hover {
+  background-color: #53075a;
+}
+
+.Upld-Butt {
+  display: none;
+}
+
+.Upld-Butt:hover {
+  background-color: #53075a;
+}
+
+.Upld-Butt:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
+
+.Submit-Butt {
+  border-radius: 5px;
+  position: relative;
+  margin: auto;
+  text-align: center;
+  border: 4px dashed #b83b5e;
+  background-color: #6a2c70;
+  display: inline-block;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 35px;
+  font-weight: bolder;
+  color: khaki;
+  font-family: "Lucida Grande", Geneva, Verdana, Arial, Helvetica, sans-serif;
+}
+
+.Submit-Butt:hover {
+  background-color: #53075a;
+}
+
+.Submit-Butt:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
+
+.FormItems {
+  display: flex;
+  flex-direction: column;
+
+}
+
+.FormItems>* {
+  margin-top:40px;
+}
+
+.NormalLabel
+{
+  margin-right: 35px;
+  -webkit-appearance: none;
+}
+
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button
+{
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number]
+{
+  -moz-appearance: textfield;
+}
+
+.quantity  {
+  width: 45px;
+  height: 42px;
+  line-height: 1.65;
+  padding: 0;
+  margin: 0;
+  padding-left: 20px;
+  border: 2px solid rebeccapurple;
+  font-size:2rem;
+  justify-self: center;
+  background-color: wheat;
+}
+
+.quantity input:focus {
+  outline: 0;
+}
+
+
+.Img-Container {
+  display: flex;
+  flex-flow: column wrap;
+  flex-direction: column-reverse;
+}
