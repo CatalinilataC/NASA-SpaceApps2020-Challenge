@@ -21,10 +21,25 @@ const powerCommands = require('./test_commands');
 const WebSocket = require('ws');
 const { resolve } = require("path");
 
-const PORT = 8000;
+let PORT = 8000;
+
+
+
+function sleep(milliseconds) {
+  const date = Date.now();
+  let currentDate = null;
+  do {
+    currentDate = Date.now();
+  } while (currentDate - date < milliseconds);
+}
+
+
+
+
 
 // setting up spdy server
 var server_options;
+//console.log(env);
 if (env === 'development') {
 	server_options = {
 		spdy: {
@@ -33,15 +48,16 @@ if (env === 'development') {
 		}
 	};
 } else if (env === 'production') {
+    PORT = 8443;
 	server_options = {
 		// Private key
-		//key: fs.readFileSync(__dirname + '/keys/spdy-key.pem'),
+		key: fs.readFileSync('/home/srv/cert/privkey.pem'),
 
 		// Fullchain file or cert file (prefer the former)
-		//cert: fs.readFileSync(__dirname + '/keys/spdy-fullchain.pem'),
+		cert: fs.readFileSync('/home/srv/cert/fullchain.pem'),
 
 		// **optional** SPDY-specific options
-		spdy: {
+		/*spdy: {
 			protocols: ['h2', 'spdy/3.1', 'http/1.1'],
 			plain: false,
 
@@ -51,7 +67,7 @@ if (env === 'development') {
 			// NOTE: Use with care! This should not be used without some proxy that
 			// will *always* send X_FORWARDED_FOR
 			//'x-forwarded-for': true,
-		}
+		}*/
 	};
 }
 
@@ -105,14 +121,15 @@ function authenticate(req, cb) {
 let userCounter = 0;
 //app.set('trust proxy', 1) // trust first proxy
 
-const upldir = __dirname + '\\..\\uploads';
+const upldir = path.resolve(__dirname + '/../uploads');
 
 if (fs.existsSync(upldir))
 	del.sync([upldir]);
 
 if (!fs.existsSync(upldir))
-	fs.mkdirSync(upldir, (err) => {
+	fs.mkdirSync(upldir, {mode: '0777'}, (err) => {
 		if (err) {
+            
 			return console.error(err);
 		}
 		console.log('Directory created successfully!');
@@ -146,13 +163,15 @@ app.use(express.static(__dirname + "/../build"));
 app.get('/', function (req, res) {
 	res.sendFile(__dirname + "/../build/index.html");
 });
-
+console.log("this is dirname ", __dirname);
+console.log("this is upldir", upldir);
 app.get('/register', function (req, res) {
 	const u = Users.Ulist().get(req.session.id);
 	if (!u) {
+        //console.log("ajunge la user", path.resolve(upldir + '/director' + `${userCounter}`));
 		userCounter++;
 		req.session.views = 1;
-		Users.Ulist().set(req.session.id, { sid: req.session.id, path: __dirname + '/../uploads/director' + `${userCounter}` });
+		Users.Ulist().set(req.session.id, { sid: req.session.id, path: path.resolve(upldir + '/director' + `${userCounter}`) });
 
 		fs.mkdir(Users.Ulist().get(req.session.id).path, (err) => {
 			if (err) {
@@ -170,30 +189,41 @@ let auxDays;
 let cpUpload = upload.fields([{name: 'number', maxCount: 1}, {name: 'filez', maxCount: 4}]);
 app.post('/upload', cpUpload, function (req, res) {
 	const u = Users.Ulist().get(req.session.id);
+    let arr = [];
 	if (u) {
 		u.DayNb = parseInt(req.body.number, 10); // nr de zile de prezis
 		auxDays = u.DayNb;
 		console.log(req.body);
 		u.ready2send = false;
 		req.session.views++;
+        console.log("UPLOAD1");
 		Promise.all(
 			req.files['filez'].map(elem => {
 				fs.promises.writeFile(u.path + `/${elem.originalname}`, elem.buffer);
+                arr.push(u.path + `/${elem.originalname}`);
 			})
 		).then(x => {
+            for(let j = 0; j < 4; j++)
+            {
+                    fs.chmodSync(arr[j], 0777);
+            }
+            console.log("UPLOAD2");
 
+            res.sendStatus(200);
 			// send signal to download image to frontend on socket already opened
 			const execution = new Promise((resolve, reject) => {
 				//rulez scriput sincron
+                //sleep(24999);
 				powerCommands(u.DayNb, resolve, reject, userCounter);
 			})
 				.then(() => {
+                    console.log("UPLOAD3");
 					u.ready2send = true;
 					u.wsocket.send(JSON.stringify({ type: 'signal', payload: 'getResult' }));
 				})
 
 		}).catch(err => console.log(err));
-		res.sendStatus(200);
+		
 	}
 	else {
 		res.sendStatus(400);
@@ -210,16 +240,17 @@ app.get('/finishedImages', function (req, res) {
 		res.sendStatus(400);
 		return;
 	}
-
+    console.log("UPLOAD3.5");
 	if (User.ready2send) {
 		if(User.DayNb > 0)
 		{
+            console.log("UPLOAD4");
 			User.DayNb--;
 			res.header({
 				'Content-Type': 'image/jpeg'
 			});
 			
-			res.sendFile(path.resolve(`D:\\projects_node\\nasa_interface\\FINAL_DESTINATION\\image_${User.DayNb}.jpg`));
+			res.sendFile(path.resolve(`/home/srv/nasa_interface/FINAL_DESTINATION/image_${User.DayNb}.jpg`));
 		}
 
 	}
@@ -242,7 +273,7 @@ app.get('/getCSV', function (req, res) {
 				"Content-Disposition": 'attachment; filename="picture.png"'
 			});
 			
-			res.sendFile(path.resolve(`D:\\projects_node\\nasa_interface\\FINAL_DESTINATION\\coords_${auxDays}.csv`));
+			res.sendFile(path.resolve(`/home/srv/nasa_interface/FINAL_DESTINATION/coords_${auxDays}.csv`));
 		}
 
 		

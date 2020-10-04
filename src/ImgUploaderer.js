@@ -136,7 +136,7 @@ export default class ImgUploaderer extends React.Component {
                     this.setState(prevState => (
                         {
                             ...prevState,
-                            text:`Images uploaded. Server processing! Estimated time ${10 * this.state.DayNb + 20} seconds  `,
+                            text:`Images uploaded. Server processing! Estimated time ${25 * this.state.DayNb + 20 + Math.floor(Math.random() * this.state.DayNb * 2.71)} seconds  `,
                             uploaded: true,
                             intervalRef: iRef
                         }
@@ -154,8 +154,9 @@ export default class ImgUploaderer extends React.Component {
                     // open socket
                     if (!this.state.wsocket || !this.state.wsocket.readyState === WebSocket.OPEN) {
                         let ws;
-                        if (process.env.NODE_ENV !== 'production') {
-                            ws = new WebSocket('ws://localhost:8000');
+                        console.log(process.env.NODE_ENV);
+                        if (process.env.NODE_ENV === 'production') {
+                            ws = new WebSocket('wss://alvoxel.com:8443');
                         } else {
                             ws = new WebSocket('ws://localhost:8000'); // secure websocket
                         }
