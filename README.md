@@ -1,4 +1,4 @@
-# hackathon-code--
+# NASA Space Apps Challenge 2020
 
 This a fire predictor app created for the NASA International Space Apps Challenge 2020.
 
